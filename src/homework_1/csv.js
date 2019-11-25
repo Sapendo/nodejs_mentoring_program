@@ -1,19 +1,13 @@
 import csv from 'csvtojson';
-import { writeFileSync, appendFileSync } from 'fs';
+import { createReadStream, createWriteStream } from 'fs';
+import { pipeline } from 'stream';
 
 const csvFilePath = `${__dirname}/books.csv`;
 const txtFilePath = `${__dirname}/books.txt`;
+const writeStream = createWriteStream(txtFilePath);
+const readStream = createReadStream(csvFilePath);
 
-csv()
-    .fromFile(csvFilePath)
-    .then( data => writeFile(data));
-
-function writeFile(books) {
-    books.forEach( (book, index) => {
-        if(index === 0) {
-            writeFileSync(txtFilePath, `${JSON.stringify(book)}\n`)
-        } else {
-            appendFileSync(txtFilePath, `${JSON.stringify(book)}\n`);
-        }
-    });
-}
+pipeline(
+    csv().fromStream(readStream),
+    writeStream
+)
