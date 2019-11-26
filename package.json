@@ -18,6 +18,12 @@
   },
   "homepage": "https://github.com/Sapendo/nodejs_mentoring_program#readme",
   "devDependencies": {
+    "@babel/core": "^7.7.4",
+    "@babel/preset-env": "^7.7.4",
+    "@babel/register": "^7.7.4",
     "nodemon": "^1.19.4"
+  },
+  "dependencies": {
+    "csvtojson": "^2.0.10"
   }
 }

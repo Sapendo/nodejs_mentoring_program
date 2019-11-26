@@ -9,5 +9,12 @@ const readStream = createReadStream(csvFilePath);
 
 pipeline(
     csv().fromStream(readStream),
-    writeStream
+    writeStream,
+    err => {
+        if (err) {
+          console.error('The conversion is failed.', err);
+        } else {
+          console.log('The conversion is succeeded.');
+        }
+      }
 )
