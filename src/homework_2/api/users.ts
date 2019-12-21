@@ -1,10 +1,10 @@
 import Joi from "@hapi/joi";
-import express from "express";
+import express, { Request } from "express";
 import { createValidator, ValidatedRequest } from "express-joi-validation";
 import uuid from "uuid";
 import { users } from "../db";
 import { filterUserByLogin, sortUser } from "../helper";
-import { User, UserPayloadSchema } from "../interface";
+import { ExpandedRequest, User, UserPayloadSchema } from "../interface";
 
 const router = express.Router();
 const validator = createValidator();
@@ -14,25 +14,25 @@ const querySchema: Joi.ObjectSchema = Joi.object({
 	age: Joi.number().integer().min(4).max(130).required()
 });
 
-router.param("id", (req, res, next, id) => {
-	const filteredUser: User[] = users.filter((user: User) => user.id === id);
-	if (filteredUser.length && filteredUser[0].isDelete) {
+router.param("id", (req: ExpandedRequest, res, next, id) => {
+	const userIndex: number = users.findIndex((user: User) => user.id === id);
+	if (userIndex !== -1  && users[userIndex].isDeleted) {
 		res.status(400).json({msg: `The user with id-${id} was deleted before`});
-	} else if (!filteredUser.length) {
+		return;
+	} else if (userIndex === -1) {
 		res.status(400).json({msg: `The user with id-${id} was not found`});
+		return;
+	} else {
+		req.userIndex = userIndex;
 	}
 	next();
 });
 
-router.get("/", (req, res) => {
+router.get("/", (req: Request, res) => {
 	const {limit, filterBy} = req.query;
 	const filteredUsers = filterBy ? filterUserByLogin(users, filterBy) : [];
-	const sortedUsers: User[] | null = Boolean(filteredUsers.length) ? filteredUsers.sort(sortUser) : null;
-	if (sortedUsers) {
-		res.send(sortedUsers.slice(0, limit));
-	} else {
-		res.status(400).json({msg: `According to your request users were not found`});
-	}
+	const sortedUsers: User[] = Boolean(filteredUsers.length) ? filteredUsers.sort(sortUser) : [];
+	res.send(sortedUsers.slice(0, limit));
 });
 
 router.post("/user", validator.body(querySchema), (req: ValidatedRequest<UserPayloadSchema>, res) => {
@@ -41,37 +41,30 @@ router.post("/user", validator.body(querySchema), (req: ValidatedRequest<UserPay
 		login: req.body.login,
 		password: req.body.password,
 		age: req.body.age,
-		isDelete: false
+		isDeleted: false
 	};
 	users.push(user);
 	res.send({id: user.id});
 });
 
-router.get("/user/:id", (req, res) => {
-	const id: string = req.params.id;
-	const userIndex: number = users.findIndex((user: User) => user.id === id);
-	res.json(users[userIndex]);
-});
-
-router.put("/user/:id", validator.body(querySchema), (req: ValidatedRequest<UserPayloadSchema>, res) => {
-	const id: string = req.params.id;
-	const updateUser = req.body;
-	users.forEach((user: User) => {
-		if (user.id === id) {
-			// user = { ...updateUser };
-			user.login = updateUser.login;
-			user.password = updateUser.password;
-			user.age = updateUser.age;
-		}
+router.route("/user/:id")
+	.get((req: ExpandedRequest, res) => {
+		res.json(users[req.userIndex!]);
+	})
+	.put(validator.body(querySchema), (req: ValidatedRequest<UserPayloadSchema>, res) => {
+		const id: string = req.params.id;
+		const updateUser = req.body;
+		users.find((user: User) => {
+			if (user.id === id) {
+				user = Object.assign(user, updateUser);
+			}
+		});
+		res.json({msg: `The user with id-${id} was updated`});
+	})
+	.delete((req: ExpandedRequest, res) => {
+		users[req.userIndex!].isDeleted = true;
+		res.status(204).json({msg: `The user with id-${req.params.id} was deleted`});
 	});
-	res.json({msg: `The user with id-${id} was updated`});
-});
-
-router.delete("/user/:id", (req, res) => {
-	const id: string = req.params.id;
-	const userIndex: number = users.findIndex((user: User) => user.id === id);
-	users[userIndex].isDelete = true;
-	res.status(204).json({msg: `The user with id-${id} was deleted`});
-});
 
 export { router };
+

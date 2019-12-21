@@ -1,1 +1,3 @@
-export const users = [];
+import { User } from "./interface";
+
+export const users: User[] = [];
