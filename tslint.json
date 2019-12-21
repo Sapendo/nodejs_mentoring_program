@@ -1,0 +1,21 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "jsRules": {},
+    "rules": {
+        "trailing-comma": [ false ],
+        "indent": [true, "tabs", 4],
+        "no-console": [true, "debug", "info", "time", "timeEnd", "trace"],
+        "no-debugger": true,
+        "no-duplicate-variable": true,
+        "no-trailing-whitespace": true,
+        "no-var-keyword": true,
+        "prefer-const": true,
+        "semicolon": [true, "always"],
+        "interface-name": false,
+        "object-literal-sort-keys": false
+    },
+    "rulesDirectory": []
+}
