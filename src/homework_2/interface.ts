@@ -1,8 +1,9 @@
+import { Request } from "express";
 import { ContainerTypes, ValidatedRequestSchema } from "express-joi-validation";
 
 export interface User extends UserPayload {
 	id: string;
-	isDelete: boolean;
+	isDeleted: boolean;
 }
 
 export interface UserPayload {
@@ -14,4 +15,8 @@ export interface UserPayload {
 
 export interface UserPayloadSchema extends ValidatedRequestSchema {
 	[ContainerTypes.Body]: UserPayload;
+}
+
+export interface ExpandedRequest extends Request {
+	userIndex?: number;
 }
