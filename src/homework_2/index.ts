@@ -1,5 +1,5 @@
 import express from "express";
-import {router} from "./api/users";
+import {router} from "./routers/users-router";
 
 const PORT: string = process.env.dev || "3000";
 

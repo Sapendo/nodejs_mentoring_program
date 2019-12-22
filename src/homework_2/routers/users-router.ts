@@ -1,11 +1,11 @@
 import Joi from "@hapi/joi";
 import express, { Request } from "express";
 import { createValidator, ValidatedRequest } from "express-joi-validation";
-import uuid from "uuid";
 import { users } from "../db";
-import { filterUserByLogin, sortUser } from "../helper";
 import { ExpandedRequest, User, UserPayloadSchema } from "../interface";
+import { UsersService } from "../services/users-service";
 
+const usersService: any = new UsersService();
 const router = express.Router();
 const validator = createValidator();
 const querySchema: Joi.ObjectSchema = Joi.object({
@@ -29,22 +29,12 @@ router.param("id", (req: ExpandedRequest, res, next, id) => {
 });
 
 router.get("/", (req: Request, res) => {
-	const {limit, filterBy} = req.query;
-	const filteredUsers = filterBy ? filterUserByLogin(users, filterBy) : [];
-	const sortedUsers: User[] = Boolean(filteredUsers.length) ? filteredUsers.sort(sortUser) : [];
-	res.send(sortedUsers.slice(0, limit));
+	res.send(usersService.getAutoSuggestUsers(req.query));
 });
 
 router.post("/user", validator.body(querySchema), (req: ValidatedRequest<UserPayloadSchema>, res) => {
-	const user: User = {
-		id: uuid.v4(),
-		login: req.body.login,
-		password: req.body.password,
-		age: req.body.age,
-		isDeleted: false
-	};
-	users.push(user);
-	res.send({id: user.id});
+	const id: string = usersService.addUser(req.body);
+	res.send({id: id});
 });
 
 router.route("/user/:id")
@@ -52,17 +42,11 @@ router.route("/user/:id")
 		res.json(users[req.userIndex!]);
 	})
 	.put(validator.body(querySchema), (req: ValidatedRequest<UserPayloadSchema>, res) => {
-		const id: string = req.params.id;
-		const updateUser = req.body;
-		users.find((user: User) => {
-			if (user.id === id) {
-				user = Object.assign(user, updateUser);
-			}
-		});
-		res.json({msg: `The user with id-${id} was updated`});
+		usersService.updateUser(req.params.id, req.body);
+		res.json({msg: `The user with id-${req.params.id} was updated`});
 	})
 	.delete((req: ExpandedRequest, res) => {
-		users[req.userIndex!].isDeleted = true;
+		usersService.deleteUser(req.userIndex);
 		res.status(204).json({msg: `The user with id-${req.params.id} was deleted`});
 	});
 
