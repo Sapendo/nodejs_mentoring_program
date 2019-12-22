@@ -14,7 +14,7 @@ function filterUserByLogin(users: User[], loginSub: string) {
 	return users.filter((user: User) => {
 		const login: string = user.login.toLowerCase();
 		const loginSubstring: string = loginSub.toLowerCase();
-		return login.includes(loginSubstring);
+		return ( login.includes(loginSubstring) && !user.isDeleted);
 	});
 }
 export {sortUser, filterUserByLogin};
