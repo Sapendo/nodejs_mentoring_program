@@ -1,52 +1,51 @@
-import Joi from "@hapi/joi";
-import express, { Request } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import { createValidator, ValidatedRequest } from "express-joi-validation";
-import { users } from "../db";
-import { ExpandedRequest, User, UserPayloadSchema } from "../interface";
+import { UserPayloadSchema } from "../interface";
 import { UsersService } from "../services/users-service";
+import { payloadValidationSchema } from "../validators/user-payload";
 
 const usersService: any = new UsersService();
 const router = express.Router();
 const validator = createValidator();
-const querySchema: Joi.ObjectSchema = Joi.object({
-	login: Joi.string().required(),
-	password: Joi.string().regex(/[a-zA-Z]+[0-9]+/).required(),
-	age: Joi.number().integer().min(4).max(130).required()
+
+router.param("id", (req: Request, res: Response, next: NextFunction, id: string) => {
+	if (usersService.isUserFound(id)) {
+		next();
+	} else {
+		res.status(400).json({msg: `The user with id-${id} was not found`});
+	}
 });
 
-router.param("id", (req: ExpandedRequest, res, next, id) => {
-	const userIndex: number = users.findIndex((user: User) => user.id === id);
-	if (userIndex !== -1  && users[userIndex].isDeleted) {
-		res.status(400).json({msg: `The user with id-${id} was deleted before`});
-		return;
-	} else if (userIndex === -1) {
-		res.status(400).json({msg: `The user with id-${id} was not found`});
-		return;
+router.param("id", (req: Request, res: Response, next: NextFunction, id: string) => {
+	if (usersService.isUserDeleted(id)) {
+		next();
 	} else {
-		req.userIndex = userIndex;
+		res.status(400).json({msg: `The user with id-${id} was deleted before`});
 	}
-	next();
 });
 
 router.get("/", (req: Request, res) => {
 	res.send(usersService.getAutoSuggestUsers(req.query));
 });
 
-router.post("/user", validator.body(querySchema), (req: ValidatedRequest<UserPayloadSchema>, res) => {
+router.post(
+	"/user",
+	validator.body(payloadValidationSchema),
+	(req: ValidatedRequest<UserPayloadSchema>, res: Response) => {
 	const id: string = usersService.addUser(req.body);
 	res.send({id: id});
 });
 
 router.route("/user/:id")
-	.get((req: ExpandedRequest, res) => {
-		res.json(users[req.userIndex!]);
+	.get((req: Request, res: Response) => {
+		res.json(usersService.getUser(req.params.id));
 	})
-	.put(validator.body(querySchema), (req: ValidatedRequest<UserPayloadSchema>, res) => {
+	.put(validator.body(payloadValidationSchema), (req: ValidatedRequest<UserPayloadSchema>, res: Response) => {
 		usersService.updateUser(req.params.id, req.body);
 		res.json({msg: `The user with id-${req.params.id} was updated`});
 	})
-	.delete((req: ExpandedRequest, res) => {
-		usersService.deleteUser(req.userIndex);
+	.delete((req: Request, res: Response) => {
+		usersService.deleteUser(req.params.id);
 		res.status(204).json({msg: `The user with id-${req.params.id} was deleted`});
 	});
 
