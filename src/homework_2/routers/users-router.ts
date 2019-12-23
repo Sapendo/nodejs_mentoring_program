@@ -15,6 +15,7 @@ router.param("id", (req: Request, res: Response, next: NextFunction, id: string)
 		res.status(400).json({msg: `The user with id-${id} was not found`});
 	}
 });
+
 router.param("id", (req: Request, res: Response, next: NextFunction, id: string) => {
 	if (usersService.isUserDeleted(id)) {
 		next();
@@ -23,7 +24,7 @@ router.param("id", (req: Request, res: Response, next: NextFunction, id: string)
 	}
 });
 
-router.get("/", (req: Request, res: Response) => {
+router.get("/", (req: Request, res) => {
 	res.send(usersService.getAutoSuggestUsers(req.query));
 });
 
@@ -32,7 +33,7 @@ router.post(
 	validator.body(payloadValidationSchema),
 	(req: ValidatedRequest<UserPayloadSchema>, res: Response) => {
 	const id: string = usersService.addUser(req.body);
-	res.send({id});
+	res.send({id: id});
 });
 
 router.route("/user/:id")
@@ -49,3 +50,4 @@ router.route("/user/:id")
 	});
 
 export { router };
+
