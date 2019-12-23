@@ -33,7 +33,7 @@ router.post(
 	validator.body(payloadValidationSchema),
 	(req: ValidatedRequest<UserPayloadSchema>, res: Response) => {
 	const id: string = usersService.addUser(req.body);
-	res.send({id: id});
+	res.send({id});
 });
 
 router.route("/user/:id")
@@ -50,4 +50,3 @@ router.route("/user/:id")
 	});
 
 export { router };
-
