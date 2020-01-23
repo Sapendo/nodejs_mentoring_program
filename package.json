@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node src/homework_2/index.ts",
     "lint": "tslint -c tslint.json -p tsconfig.json --fix",
     "reverse": "nodemon ./src/homework_1/reverse",
     "csv": "nodemon ./src/homework_1/task_2",

@@ -4,7 +4,7 @@ import { Model } from "sequelize/types";
 import { UserDB } from "./data-access/user.db";
 const Sequelize = require('sequelize');
 
-const PORT: string = process.env.dev || "3000";
+const PORT: string = process.env.PORT || "3000";
 
 const app = express();
 
