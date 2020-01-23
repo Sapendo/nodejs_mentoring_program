@@ -31,8 +31,8 @@ router.get("/", (req: Request, res) => {
 router.post(
 	"/user",
 	validator.body(payloadValidationSchema),
-	(req: ValidatedRequest<UserPayloadSchema>, res: Response) => {
-	const id: string = usersService.addUser(req.body);
+	async (req: ValidatedRequest<UserPayloadSchema>, res: Response) => {
+	const id: string = await usersService.addUser(req.body);
 	res.send({id});
 });
 
