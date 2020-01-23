@@ -2,6 +2,7 @@ import uuid from "uuid";
 import { users } from "../db";
 import { filterUserByLogin, sortUser } from "../helper";
 import { User, UserPayload } from "../interface";
+import { UserDB } from "../data-access/user.db";
 
 export class UsersService {
 
@@ -13,16 +14,28 @@ export class UsersService {
 		return user && !user.isDeleted;
 	}
 
-	public addUser(payload: UserPayload): string {
-		const user: User = {
-			id: uuid.v4(),
-			login: payload.login,
-			password: payload.password,
-			age: payload.age,
-			isDeleted: false
-		};
-		users.push(user);
-		return user.id;
+	public async addUser(payload: UserPayload): Promise<string> {
+		let result: User;
+		// const user: User = {
+		// 	id: uuid.v4(),
+		// 	login: payload.login,
+		// 	password: payload.password,
+		// 	age: payload.age,
+		// 	isDeleted: false
+		// };
+		// users.push(user);
+		// return user.id;
+		try {
+			result = await UserDB.create({
+				login: payload.login,
+				password: payload.password,
+				age: payload.age,
+				isDeleted: false
+			  });			
+		} catch (error) {
+			console.log(error)
+		}
+		return result.id;
 	}
 
 	public getUser(id: string): User {
