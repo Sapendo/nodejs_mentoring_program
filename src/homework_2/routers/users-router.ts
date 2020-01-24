@@ -8,24 +8,24 @@ const usersService: any = new UsersService();
 const router = express.Router();
 const validator = createValidator();
 
-router.param("id", (req: Request, res: Response, next: NextFunction, id: string) => {
-	if (usersService.isUserFound(id)) {
+router.param("id", async (req: Request, res: Response, next: NextFunction, id: string) => {
+	if ( await usersService.isUserFound(id)) {
 		next();
 	} else {
 		res.status(400).json({msg: `The user with id-${id} was not found`});
 	}
 });
 
-router.param("id", (req: Request, res: Response, next: NextFunction, id: string) => {
-	if (usersService.isUserDeleted(id)) {
+router.param("id", async (req: Request, res: Response, next: NextFunction, id: string) => {
+	if (await usersService.isUserDeleted(id)) {
 		next();
 	} else {
 		res.status(400).json({msg: `The user with id-${id} was deleted before`});
 	}
 });
 
-router.get("/", (req: Request, res) => {
-	res.send(usersService.getAutoSuggestUsers(req.query));
+router.get("/", async (req: Request, res) => {
+	res.send(await usersService.getAutoSuggestUsers(req.query));
 });
 
 router.post(
@@ -37,8 +37,9 @@ router.post(
 });
 
 router.route("/user/:id")
-	.get((req: Request, res: Response) => {
-		res.json(usersService.getUser(req.params.id));
+	.get(async (req: Request, res: Response) => {
+		const user: any = await usersService.getUser(req.params.id);
+		res.json(user);
 	})
 	.put(validator.body(payloadValidationSchema), (req: ValidatedRequest<UserPayloadSchema>, res: Response) => {
 		usersService.updateUser(req.params.id, req.body);
