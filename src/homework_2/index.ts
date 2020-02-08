@@ -1,6 +1,7 @@
 import express from "express";
 import { sequelize } from "./data-access/user.db";
-import { router } from "./routers/users-router";
+import { groupRouter } from "./routers/groups-router";
+import { userRouter } from "./routers/users-router";
 
 const PORT: string = process.env.dev || "3000";
 
@@ -10,6 +11,7 @@ sequelize.sync().catch((err: any) => console.log(err));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use("/api/users", router);
+app.use("/api/users", userRouter);
+app.use("/api/groups", groupRouter);
 
 app.listen(PORT, () => console.log("Server start"));
