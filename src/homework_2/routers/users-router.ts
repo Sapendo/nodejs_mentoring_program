@@ -50,4 +50,4 @@ router.route("/user/:id")
 		res.status(204).json({msg: `The user with id-${req.params.id} was deleted`});
 	});
 
-export { router };
+export { router as userRouter };

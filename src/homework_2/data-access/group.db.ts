@@ -1,24 +1,22 @@
 import { Model } from "sequelize";
-import { GroupDB } from "./group.db";
+import { UserDB } from "./user.db";
 import { UserGroupDB } from "./userGroup.db";
 const Sequelize = require("sequelize");
 
-export class UserDB extends Model { }
+export class GroupDB extends Model { }
 export const sequelize = new Sequelize();
 
-UserDB.init({
+GroupDB.init({
 	id: {
 		primaryKey: true,
 		type: Sequelize.UUID,
 		defaultValue: Sequelize.UUIDV4,
 	},
-	login: Sequelize.STRING,
-	password: Sequelize.STRING,
-	age: Sequelize.INTEGER,
-	isDeleted: Sequelize.BOOLEAN
+	name: Sequelize.STRING,
+	permissions: Sequelize.STRING
 }, {
 	sequelize,
-	modelName: "user"
+	modelName: "groups"
 });
 
-UserDB.belongsToMany(GroupDB, {through: UserGroupDB});
+GroupDB.belongsToMany(UserDB, {through: UserGroupDB});
