@@ -16,7 +16,9 @@
         "semicolon": [true, "always"],
         "interface-name": false,
         "object-literal-sort-keys": false,
-        "no-var-requires": false
+        "no-var-requires": false,
+        "class-name": false,
+        "member-access": false
     },
     "rulesDirectory": []
 }

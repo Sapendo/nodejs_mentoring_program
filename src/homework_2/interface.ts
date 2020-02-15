@@ -2,29 +2,29 @@ import { ContainerTypes, ValidatedRequestSchema } from "express-joi-validation";
 
 export type Permission = "READ" | "WRITE" | "DELETE" | "SHARE" | "UPLOAD_FILES";
 
-export interface User extends UserPayload {
+export interface IUser extends IUserPayload {
 	id: string;
 	isDeleted: boolean;
 }
 
-export interface UserPayload {
+export interface IUserPayload {
 	login: string;
 	password: string;
 	age: number;
 
 }
-export interface Group extends GroupPayload {
+export interface IGroup extends IGroupPayload {
 	id: string;
 }
 
-export interface GroupPayload {
+export interface IGroupPayload {
 	name: string;
 	permission: Permission[];
 }
 
 export interface UserPayloadSchema extends ValidatedRequestSchema {
-	[ContainerTypes.Body]: UserPayload;
+	[ContainerTypes.Body]: IUserPayload;
 }
 export interface GroupPayloadSchema extends ValidatedRequestSchema {
-	[ContainerTypes.Body]: GroupPayload;
+	[ContainerTypes.Body]: IGroupPayload;
 }

@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+	  "experimentalDecorators": true,
     "resolveJsonModule": true,
     /* Basic Options */
     // "incremental": true,                   /* Enable incremental compilation */
