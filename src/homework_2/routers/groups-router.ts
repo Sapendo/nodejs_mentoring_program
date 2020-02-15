@@ -2,7 +2,7 @@ import express, { NextFunction, Request, Response } from "express";
 import { createValidator, ValidatedRequest } from "express-joi-validation";
 import { GroupPayloadSchema } from "../interface";
 import { GroupsService } from "../services/groups-service";
-import { payloadValidationSchema } from "../validators/user-payload";
+import { payloadGroupValidationSchema } from "../validators/group-payload";
 
 const groupService: any = new GroupsService();
 const router = express.Router();
@@ -22,17 +22,21 @@ router.get("/", async (req: Request, res) => {
 
 router.post(
 	"/group",
-	validator.body(payloadValidationSchema),
+	validator.body(payloadGroupValidationSchema),
 	async (req: ValidatedRequest<GroupPayloadSchema>, res: Response) => {
 	const id: string = await groupService.addGroup(req.body);
 	res.send({id});
 });
 
-router.put(
-	"/users-to-group",
+router.post(
+	"/users-to-group/:id",
 	async (req: Request, res: Response) => {
-	const id: string = await groupService.addUsersToGroup(req.params.id, req.body);
-	res.json({msg: `The group with id-${req.params.id} was updated`});
+		try {
+			await groupService.addUsersToGroup(req.params.id, req.body.userIds);
+			res.json({msg: `The users was added to group`});
+		} catch (error) {
+			res.status(404).json({msg: error.message});
+		}
 });
 
 router.route("/group/:id")
@@ -40,7 +44,7 @@ router.route("/group/:id")
 		const group: any = await groupService.getGroup(req.params.id);
 		res.json(group);
 	})
-	.put(validator.body(payloadValidationSchema), (req: ValidatedRequest<GroupPayloadSchema>, res: Response) => {
+	.put(validator.body(payloadGroupValidationSchema), (req: ValidatedRequest<GroupPayloadSchema>, res: Response) => {
 		groupService.updateGroup(req.params.id, req.body);
 		res.json({msg: `The group with id-${req.params.id} was updated`});
 	})

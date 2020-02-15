@@ -1,21 +1,21 @@
 import { Op } from "sequelize";
 import uuid from "uuid";
-import { UserDB } from "../data-access/user.db";
-import { User, UserPayload } from "../interface";
+import User from "../data-access/user";
+import { IUser, IUserPayload } from "../interface";
 
 export class UsersService {
 
 	public async isUserFound(id: string): Promise<boolean> {
-		const { dataValues: user }: any = await UserDB.findByPk(id);
+		const { dataValues: user }: any = await User.findByPk(id);
 		return Boolean(user);
 	}
 	public async isUserDeleted(id: string): Promise<boolean> {
-		const user: User = await this.findUser(id);
+		const user: IUser = await this.findUser(id);
 		return user && !user.isDeleted;
 	}
 
-	public async addUser(payload: UserPayload): Promise<string> {
-		const result: User = await UserDB.create({
+	public async addUser(payload: IUserPayload): Promise<string> {
+		const result: IUser = await User.create({
 				id: uuid.v4(),
 				login: payload.login,
 				password: payload.password,
@@ -25,23 +25,23 @@ export class UsersService {
 		return result.id;
 	}
 
-	public async getUser(id: string): Promise<User> {
-		const user: User = await this.findUser(id);
+	public async getUser(id: string): Promise<IUser> {
+		const user: IUser = await this.findUser(id);
 		return user;
 	}
-	public updateUser(id: string, payload: UserPayload) {
-		UserDB.update(payload, { where: { id } });
+	public updateUser(id: string, payload: IUserPayload) {
+		User.update(payload, { where: { id } });
 	}
 
 	public async deleteUser(id: string) {
-		const user: User = await this.findUser(id);
-		const deletedUser: User = { ...user, isDeleted: true };
+		const user: IUser = await this.findUser(id);
+		const deletedUser: IUser = { ...user, isDeleted: true };
 		this.updateUser(id, deletedUser);
 	}
 
 	public async getAutoSuggestUsers(query: any) {
 		if (Boolean(query.filterBy)) {
-			const foundUsers: User[] = await UserDB.findAll({
+			const foundUsers: IUser[] = await User.findAll({
 				where: {
 					login: {
 						[Op.substring]: query.filterBy
@@ -58,8 +58,8 @@ export class UsersService {
 		return [];
 	}
 
-	private async findUser(id: string): Promise<User> {
-		const user: any = await UserDB.findByPk(id);
+	private async findUser(id: string): Promise<IUser> {
+		const user: any = await User.findByPk(id);
 		return user.get({ plain: true });
 	}
 }

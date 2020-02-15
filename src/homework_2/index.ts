@@ -1,17 +1,15 @@
-import express from "express";
-import { sequelize } from "./data-access/user.db";
-import { groupRouter } from "./routers/groups-router";
-import { userRouter } from "./routers/users-router";
+import {createServer} from "http";
+import {app} from "./app";
+import {sequelize} from "./sequelize";
 
-const PORT: string = process.env.dev || "3000";
+const port = process.env.PORT || 3000;
 
-const app = express();
+(async () => {
+  await sequelize.sync().catch((err: any) => console.log(err));
 
-sequelize.sync().catch((err: any) => console.log(err));
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use("/api/users", userRouter);
-app.use("/api/groups", groupRouter);
-
-app.listen(PORT, () => console.log("Server start"));
+  createServer(app)
+	.listen(
+		port,
+		() => console.log(`Server running on port ${port}`)
+	);
+})();
