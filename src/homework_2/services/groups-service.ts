@@ -41,18 +41,16 @@ export class GroupsService {
 
 	public async addUsersToGroup(id: string, payload: string[]): Promise<any> {
 		const transaction: Transaction = await sequelize.transaction();
-		// tslint:disable-next-line: prefer-for-of
+			// tslint:disable-next-line: prefer-for-of
 		for (let i: number = 0; i < payload.length; i++) {
 			const user: IUser = await User.findByPk(payload[i], { transaction });
 			if (!user) {
 				throw Error(`The user with id ${payload[i]} is absent in the database.`);
-				break;
 			}
 			await UserGroup.create({
 				groupId: id,
 				userId: payload[i]
 			}, { transaction });
-			await transaction.commit();
 		}
 	}
 
