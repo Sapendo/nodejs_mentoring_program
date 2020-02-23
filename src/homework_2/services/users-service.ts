@@ -6,8 +6,8 @@ import { IUser, IUserPayload } from "../interface";
 export class UsersService {
 
 	public async isUserFound(id: string): Promise<boolean> {
-		const { dataValues: user }: any = await User.findByPk(id);
-		return Boolean(user);
+		const dataValues: any = await User.findByPk(id);
+		return Boolean(dataValues);
 	}
 	public async isUserDeleted(id: string): Promise<boolean> {
 		const user: IUser = await this.findUser(id);

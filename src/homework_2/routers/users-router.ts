@@ -24,7 +24,7 @@ router.param("id", async (req: Request, res: Response, next: NextFunction, id: s
 	}
 });
 
-router.get("/", async (req: Request, res) => {
+router.get("/", async (req: Request, res: Response) => {
 	res.send(await usersService.getAutoSuggestUsers(req.query));
 });
 
@@ -32,8 +32,8 @@ router.post(
 	"/user",
 	validator.body(payloadValidationSchema),
 	async (req: ValidatedRequest<UserPayloadSchema>, res: Response) => {
-	const id: string = await usersService.addUser(req.body);
-	res.send({id});
+		const id: string = await usersService.addUser(req.body);
+		res.send({id});
 });
 
 router.route("/user/:id")
