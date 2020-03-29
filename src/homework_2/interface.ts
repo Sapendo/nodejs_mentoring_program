@@ -10,7 +10,7 @@ export interface IUser extends IUserPayload {
 export interface IUserPayload {
 	login: string;
 	password: string;
-	age: number;
+	age?: number;
 
 }
 export interface IGroup extends IGroupPayload {

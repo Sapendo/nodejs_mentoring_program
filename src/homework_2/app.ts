@@ -1,9 +1,12 @@
 import express, { Request, Response } from "express";
 import { createWriteStream } from "fs";
+import * as jwt from "jsonwebtoken";
 import morgan from "morgan";
 import path from "path";
+import User from "./data-access/user";
 import { groupRouter } from "./routers/groups-router";
 import { userRouter } from "./routers/users-router";
+import { UsersService } from "./services/users-service";
 
 const accessLogStream = createWriteStream(path.join(__dirname, "access.log"), { flags: "a" });
 const loggerFormat = ":method :url :status Body - :body :response-time";
@@ -26,5 +29,37 @@ app.use(morgan(loggerFormat, {
 	skip: (req: Request, res: Response) => res.statusCode < 400,
 	stream: accessLogStream
 }));
+
+app.post("/api/login", async (req: any, res: Response) => {
+	const usersService: any = new UsersService();
+	const isLogin: boolean = await usersService.login(req.body);
+	if (isLogin) {
+		jwt.sign({User}, "privatekey", { expiresIn: "1h" }, (err, token) => {
+			if (err) {
+				console.log(err);
+			}
+			res.send(token);
+		});
+	} else {
+		res.status(403).json({msg: `The login or password was incorrect.`});
+	}
+});
+
+app.use((req: any, res, next) => {
+	const header = req.headers.authorization;
+	if (typeof header !== "undefined") {
+		const token = header.split(" ")[1];
+		req.token = token;
+	} else {
+		res.status(401).json({msg: `Please authorize`});
+	}
+
+	jwt.verify(req.token, "privatekey", (err: any, authorizedData: any) => {
+		if (err) {
+			res.status(403).json({msg: `The token is incorrect`});
+		}
+		next();
+	});
+});
 app.use("/api/users", userRouter);
 app.use("/api/groups", groupRouter);
