@@ -29,6 +29,16 @@ export class UsersService {
 		const user: IUser = await this.findUser(id);
 		return user;
 	}
+	public async login(body: any): Promise<boolean> {
+		const { login, password } = body;
+		const user: IUser[] = await User.findAll({
+			where: {
+				login,
+				password
+			}
+		  });
+		return user.length > 0;
+	}
 	public updateUser(id: string, payload: IUserPayload) {
 		User.update(payload, { where: { id } });
 	}
