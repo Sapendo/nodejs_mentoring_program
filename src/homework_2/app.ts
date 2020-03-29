@@ -32,9 +32,9 @@ app.use(morgan(loggerFormat, {
 
 app.post("/api/login", async (req: any, res: Response) => {
 	const usersService: any = new UsersService();
-	const isLogin: boolean = await usersService.login(req.body);
-	if (isLogin) {
-		jwt.sign({User}, "privatekey", { expiresIn: "1h" }, (err, token) => {
+	const userId: string = await usersService.login(req.body);
+	if (userId) {
+		jwt.sign({userId, login: req.body.login}, "privatekey", { expiresIn: "1h" }, (err, token) => {
 			if (err) {
 				console.log(err);
 			}
@@ -42,6 +42,7 @@ app.post("/api/login", async (req: any, res: Response) => {
 		});
 	} else {
 		res.status(403).json({msg: `The login or password was incorrect.`});
+		return;
 	}
 });
 
@@ -52,11 +53,13 @@ app.use((req: any, res, next) => {
 		req.token = token;
 	} else {
 		res.status(401).json({msg: `Please authorize`});
+		return;
 	}
 
 	jwt.verify(req.token, "privatekey", (err: any, authorizedData: any) => {
 		if (err) {
 			res.status(403).json({msg: `The token is incorrect`});
+			return;
 		}
 		next();
 	});
