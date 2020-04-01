@@ -1,9 +1,9 @@
+import cors from "cors";
 import express, { Request, Response } from "express";
 import { createWriteStream } from "fs";
 import * as jwt from "jsonwebtoken";
 import morgan from "morgan";
 import path from "path";
-import User from "./data-access/user";
 import { groupRouter } from "./routers/groups-router";
 import { userRouter } from "./routers/users-router";
 import { UsersService } from "./services/users-service";
@@ -22,6 +22,7 @@ process.on("uncaughtException", (err: any) => {
   });
 
 export const app = express();
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
