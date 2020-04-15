@@ -39,14 +39,14 @@ export class UsersService {
 		  });
 		return user.length > 0 ? user[0].id : null;
 	}
-	public updateUser(id: string, payload: IUserPayload) {
-		User.update(payload, { where: { id } });
+	public async updateUser(id: string, payload: IUserPayload) {
+		await User.update(payload, { where: { id } });
 	}
 
 	public async deleteUser(id: string) {
 		const user: IUser = await this.findUser(id);
 		const deletedUser: IUser = { ...user, isDeleted: true };
-		this.updateUser(id, deletedUser);
+		await this.updateUser(id, deletedUser);
 	}
 
 	public async getAutoSuggestUsers(query: any) {

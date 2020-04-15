@@ -41,8 +41,8 @@ router.route("/user/:id")
 		const user: any = await usersService.getUser(req.params.id);
 		res.json(user);
 	})
-	.put(validator.body(payloadValidationSchema), (req: ValidatedRequest<UserPayloadSchema>, res: Response) => {
-		usersService.updateUser(req.params.id, req.body);
+	.put(validator.body(payloadValidationSchema), async (req: ValidatedRequest<UserPayloadSchema>, res: Response) => {
+		await usersService.updateUser(req.params.id, req.body);
 		res.json({msg: `The user with id-${req.params.id} was updated`});
 	})
 	.delete((req: Request, res: Response) => {

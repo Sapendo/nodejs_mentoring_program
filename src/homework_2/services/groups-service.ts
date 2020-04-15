@@ -9,8 +9,12 @@ import { sequelize } from "../sequelize";
 export class GroupsService {
 
 	public async isGroupFound(id: string): Promise<boolean> {
-		const { dataValues: group }: any = await Group.findByPk(id);
-		return Boolean(group);
+		try {
+			const { dataValues: group }: any = await Group.findByPk(id);
+			return Boolean(group);
+		} catch (error) {
+			return false;
+		}
 	}
 
 	public async addGroup(payload: IGroupPayload): Promise<string> {
@@ -26,13 +30,13 @@ export class GroupsService {
 		const group: IGroup = await this.findGroup(id);
 		return group;
 	}
-	public updateGroup(id: string, payload: IGroupPayload) {
-		Group.update({...payload}, { where: { id } });
+	public async updateGroup(id: string, payload: IGroupPayload) {
+		await Group.update({...payload}, { where: { id } });
 	}
 
 	public async deleteGroup(id: string): Promise<void> {
 		const group: any = await Group.findByPk(id);
-		group.destroy();
+		await group.destroy();
 	}
 
 	public async getGroups(): Promise<IGroup[]> {
