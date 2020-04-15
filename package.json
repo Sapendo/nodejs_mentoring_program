@@ -7,7 +7,8 @@
     "lint": "tslint -c tslint.json -p tsconfig.json --fix",
     "reverse": "nodemon ./src/homework_1/reverse",
     "csv": "nodemon ./src/homework_1/task_2",
-    "server": "nodemon src/homework_2/index.ts"
+    "server": "nodemon src/homework_2/index.ts",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -27,6 +28,7 @@
     "@types/express": "^4.17.2",
     "@types/morgan": "^1.7.37",
     "@types/node": "^12.12.17",
+    "jest": "^25.2.7",
     "nodemon": "^1.19.4",
     "ts-node": "^8.5.4",
     "tslint": "^5.20.1",
@@ -35,6 +37,7 @@
   "dependencies": {
     "@hapi/joi": "^16.1.8",
     "@types/hapi__joi": "^16.0.4",
+    "@types/jest": "^25.2.1",
     "@types/jsonwebtoken": "^8.3.8",
     "@types/uuid": "^3.4.6",
     "cors": "^2.8.5",
@@ -48,6 +51,7 @@
     "reflect-metadata": "^0.1.13",
     "sequelize": "^5.21.3",
     "sequelize-typescript": "^1.1.0",
+    "ts-jest": "^25.3.1",
     "uuid": "^3.3.3"
   }
 }
